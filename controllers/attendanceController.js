@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const { Attendance, AttendanceSchedule, User } = require("../models");
 
 exports.getAllAttendances = async (req, res) => {
@@ -46,18 +47,25 @@ exports.createAttendance = async (req, res) => {
     }
 
     // Proses waktu kehadiran sebagai objek Date
-    const attendanceTime = new Date(attendance_time);
+    const attendanceDate = new Date(attendance_time);
+    const startOfDay = new Date(attendanceDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(attendanceDate.setHours(23, 59, 59, 999));
 
-    // Cek apakah pengguna sudah mencatat kehadiran
+    // Cek apakah pengguna sudah mencatat kehadiran untuk hari ini
     const existingAttendance = await Attendance.findOne({
       where: {
         user_id: userId,
         schedule_id: schedule_id,
-        attendance_type: attendance_type,
+        attendance_time: {
+          [Op.between]: [startOfDay, endOfDay],
+        },
       },
     });
+
     if (existingAttendance) {
-      return res.status(400).json({ message: "Attendance already recorded" });
+      return res
+        .status(400)
+        .json({ message: "Attendance already recorded for today" });
     }
 
     // Buat kehadiran baru
@@ -65,7 +73,7 @@ exports.createAttendance = async (req, res) => {
       user_id: userId,
       company_id: user.company_id,
       schedule_id,
-      attendance_time: attendanceTime,
+      attendance_time: new Date(),
       attendance_type,
     });
 
