@@ -1,9 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const attendanceScheduleController = require("../controllers/attendanceScheduleController");
+const authenticateJWT = require("../middleware/authenticateJWT");
 
 router.get(
   "/attendance-schedules",
+  authenticateJWT,
   attendanceScheduleController.getAllAttendanceSchedules
 );
 router.get(

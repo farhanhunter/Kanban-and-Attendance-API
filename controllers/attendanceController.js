@@ -1,9 +1,14 @@
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 const { Attendance, AttendanceSchedule, User } = require("../models");
 
 exports.getAllAttendances = async (req, res) => {
+  console.log(req.userId);
   try {
-    const attendances = await Attendance.findAll();
+    const attendances = await Attendance.findAll({
+      where: {
+        user_id: req.userId,
+      },
+    });
     res.json(attendances);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -56,6 +61,7 @@ exports.createAttendance = async (req, res) => {
       where: {
         user_id: userId,
         schedule_id: schedule_id,
+        attendance_type: "clock_out",
         attendance_time: {
           [Op.between]: [startOfDay, endOfDay],
         },

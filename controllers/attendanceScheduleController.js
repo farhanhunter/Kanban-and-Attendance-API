@@ -1,8 +1,17 @@
 const { AttendanceSchedule } = require("../models");
+const { User } = require("../models");
 
 exports.getAllAttendanceSchedules = async (req, res) => {
   try {
-    const schedules = await AttendanceSchedule.findAll();
+    const specificDate = new Date();
+    const dayIndex = specificDate.getDay();
+    const userLogin = await User.findByPk(req.userId);
+    const schedules = await AttendanceSchedule.findAll({
+      where: {
+        company_id: userLogin.company_id,
+        day_of_week: dayIndex,
+      },
+    });
     res.json(schedules);
   } catch (error) {
     res.status(500).json({ error: error.message });

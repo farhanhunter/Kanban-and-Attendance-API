@@ -3,7 +3,11 @@ const router = express.Router();
 const attendanceController = require("../controllers/attendanceController");
 const authenticateJWT = require("../middleware/authenticateJWT");
 
-router.get("/attendances", attendanceController.getAllAttendances);
+router.get(
+  "/attendances",
+  authenticateJWT,
+  attendanceController.getAllAttendances
+);
 router.get("/attendances/:id", attendanceController.getAttendanceById);
 router.post(
   "/attendances",
