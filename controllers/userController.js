@@ -39,6 +39,29 @@ exports.createUser = async (req, res) => {
       phone_number,
       status,
     } = req.body;
+
+    // Validasi manual sebelum pembuatan user
+    if (!username) {
+      return res
+        .status(400)
+        .json({ field: "username", message: "Username is required." });
+    }
+    if (!password) {
+      return res
+        .status(400)
+        .json({ field: "password", message: "Password is required." });
+    }
+    if (!email) {
+      return res
+        .status(400)
+        .json({ field: "email", message: "Email is required." });
+    }
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      return res
+        .status(400)
+        .json({ field: "email", message: "Email format is invalid." });
+    }
+
     const hashedPassword = bcrypt.hashSync(password, 10);
     const user = await User.create({
       username,
@@ -53,9 +76,12 @@ exports.createUser = async (req, res) => {
   } catch (error) {
     console.error("Error creating user:", error);
     if (error.name === "SequelizeValidationError") {
-      return res.status(400).json({
-        error: error.errors.map((err) => err.message),
-      });
+      // Jika terjadi kesalahan validasi dari Sequelize
+      const validationErrors = error.errors.map((err) => ({
+        field: err.path,
+        message: err.message,
+      }));
+      return res.status(400).json({ errors: validationErrors });
     }
     res.status(500).json({ error: error.message });
   }
