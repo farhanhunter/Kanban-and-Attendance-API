@@ -10,6 +10,7 @@ exports.getAllAttendanceSchedules = async (req, res) => {
       where: {
         company_id: userLogin.company_id,
         day_of_week: dayIndex,
+        is_active: true, // Hanya ambil jadwal yang aktif
       },
     });
     res.json(schedules);
@@ -21,10 +22,13 @@ exports.getAllAttendanceSchedules = async (req, res) => {
 exports.getAttendanceScheduleById = async (req, res) => {
   try {
     const schedule = await AttendanceSchedule.findByPk(req.params.id);
-    if (schedule) {
+    if (schedule && schedule.is_active) {
+      // Pastikan jadwal aktif
       res.json(schedule);
     } else {
-      res.status(404).json({ message: "Attendance schedule not found" });
+      res
+        .status(404)
+        .json({ message: "Attendance schedule not found or inactive" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -33,7 +37,11 @@ exports.getAttendanceScheduleById = async (req, res) => {
 
 exports.createAttendanceSchedule = async (req, res) => {
   try {
-    const schedule = await AttendanceSchedule.create(req.body);
+    const scheduleData = {
+      ...req.body,
+      is_active: req.body.is_active !== undefined ? req.body.is_active : true, // Default ke true jika tidak ada
+    };
+    const schedule = await AttendanceSchedule.create(scheduleData);
     res.status(201).json(schedule);
   } catch (error) {
     res.status(500).json({ error: error.message });

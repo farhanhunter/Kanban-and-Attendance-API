@@ -35,6 +35,11 @@ module.exports = {
         type: Sequelize.TINYINT,
         allowNull: false,
       },
+      is_active: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true, // atau false tergantung kebutuhan
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

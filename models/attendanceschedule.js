@@ -42,12 +42,12 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       location_lat: {
-        type: DataTypes.DECIMAL(9, 6), // Adjust precision if necessary
-        allowNull: true, // Nullable
+        type: DataTypes.DECIMAL(9, 6),
+        allowNull: true,
       },
       location_long: {
-        type: DataTypes.DECIMAL(9, 6), // Adjust precision if necessary
-        allowNull: true, // Nullable
+        type: DataTypes.DECIMAL(9, 6),
+        allowNull: true,
       },
       day_of_week: {
         type: DataTypes.TINYINT,
@@ -56,6 +56,12 @@ module.exports = (sequelize, DataTypes) => {
           min: 0,
           max: 6,
         },
+      },
+      // Kolom baru
+      is_active: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true, // Sesuaikan dengan kebutuhan
       },
     },
     {
